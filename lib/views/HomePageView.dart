@@ -11,12 +11,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   Navigator.push(
-    //     context,
-    //     MaterialPageRoute(builder: (context) => Pokedex()),
-    //   );
-    // });
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Pokedex()),
+      );
+    });
   }
 
   @override
