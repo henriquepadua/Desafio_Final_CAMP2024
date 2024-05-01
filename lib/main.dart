@@ -1,3 +1,4 @@
+import 'package:desafio_final_camp2024/services/pokedex__service.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -108,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
+            Image.network("http://www.serebii.net/pokemongo/pokemon/001.png"),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -116,7 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          PokedexService.buscandoPokemons();
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

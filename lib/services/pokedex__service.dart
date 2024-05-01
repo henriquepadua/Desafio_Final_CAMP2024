@@ -3,14 +3,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PokedexService {
-  buscandoPokemons() async {
+  static void buscandoPokemons() async {
     var response = await http.get(
-      Uri.parse("https://pokeapi.co/api/v2/pokemon?limit=151"),
+      Uri.parse(
+          "https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
 
-    print((jsonEncode(response.body)));
+
+    var json = jsonEncode(response.body);
+    var jsonBody = jsonDecode(json);
   }
 }
