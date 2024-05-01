@@ -11,8 +11,7 @@ class PokedexService {
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
-
+    
     var json = jsonEncode(response.body);
     var jsonBody = jsonDecode(json);
   }
