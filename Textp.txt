@@ -1,4 +1,5 @@
 Passos:
-1- Pegar dados da API e entende-la muito bem
-2- desenhar no caderno como faria cada parte do projeto
-3- fazer a parte da tela principal que reenderiza
+1- Pegar dados da API e entende-la muito bem OK
+2- desenhar no caderno como faria cada parte do projeto OK
+3- fazer a parte da tela principal que reenderiza OK
+4- Pegar todos os dados OK

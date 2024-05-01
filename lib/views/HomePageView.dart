@@ -22,16 +22,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:const  Color.fromRGBO(236, 3, 68, 1),
+      backgroundColor: const Color.fromRGBO(236, 3, 68, 1),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          Image.asset("assets/Vector.png"),
-          const Padding(padding: EdgeInsets.all(15)),
-          Image.asset("assets/ioasyspokédex.png"),
-        ],),
+            Image.asset("assets/Vector.png"),
+            const Padding(padding: EdgeInsets.all(15)),
+            Image.asset("assets/ioasyspokédex.png"),
+          ],
+        ),
       ),
     );
   }
