@@ -10,7 +10,8 @@ class PokedexService {
   Future<List<Pokemon>> buscandoDadosDosPokemons(int contador) async {
     List<Pokemon> pokemonList = [];
     List pokemons = [];
-    var imageUrl;
+    // ignore: prefer_typing_uninitialized_variables
+    var imageUrl,type;
     final response = await http.get(Uri.parse(
         'https://pokeapi.co/api/v2/pokemon?offset=$contador&limit=15'));
 
@@ -32,6 +33,12 @@ class PokedexService {
           final jsonDataurl = jsonDecode(responseurl.body);
           final id = jsonDataurl['id'];
           final sprites = jsonDataurl['sprites'];
+          final types = jsonDataurl['types'];
+
+          for (var buscandoType in types) {
+            type = buscandoType['type']['name'];
+          }
+          debugPrint('type $type');
           if (sprites != null) imageUrl = sprites['front_default'];
 
           pokemonList.add(Pokemon(

@@ -3,3 +3,5 @@ Passos:
 2- desenhar no caderno como faria cada parte do projeto OK
 3- fazer a parte da tela principal que reenderiza OK
 4- Pegar todos os dados OK
+5- Colocar cor de fundo no nome do pokemon  OK
+6- Pegar a cor de acordo com o Type

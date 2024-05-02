@@ -79,7 +79,7 @@ class _PokedexState extends State<Pokedex> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10,20,0,5),
+                padding: const EdgeInsets.fromLTRB(10, 20, 2, 5),
                 child: FutureBuilder<List<Pokemon>>(
                   future: pokemonList,
                   builder: (context, snapshot) {
@@ -88,7 +88,8 @@ class _PokedexState extends State<Pokedex> {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       // Se ocorrer um erro durante a busca dos dados, exiba uma mensagem de erro
-                      return const Center(child: Text('Erro ao carregar dados'));
+                      return const Center(
+                          child: Text('Erro ao carregar dados'));
                     } else {
                       // Se os dados forem carregados com sucesso, construa o GridView
                       final pokemonList =
@@ -109,10 +110,13 @@ class _PokedexState extends State<Pokedex> {
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text("#${pokemon.id}",
-                                        textAlign: TextAlign.end,
-                                        style: const TextStyle(color: Colors.blue),    
+                                    Text(
+                                      "#${pokemon.id}",
+                                      textAlign: TextAlign.end,
+                                      style:
+                                          const TextStyle(color: Colors.blue),
                                     ),
                                   ],
                                 ),
@@ -120,8 +124,24 @@ class _PokedexState extends State<Pokedex> {
                                   width: 60,
                                   pokemon.imageUrl,
                                 ),
-                                Text("${pokemon.name}",
-                                    textAlign: TextAlign.end),
+                                Container(
+                                  color: Colors.blue,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        color: Colors.blue,
+                                        child: Text(
+                                          "#${pokemon.name}",
+                                          textAlign: TextAlign.end,
+                                          style: const TextStyle(
+                                              color: Colors
+                                                  .white), // Define a cor do texto como branca
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -132,23 +152,29 @@ class _PokedexState extends State<Pokedex> {
                 ),
               ),
             ),
-
-            // Expanded(
-            //   child: GridView.builder(
-            //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            //         crossAxisCount: 3, childAspectRatio: 1.4),
-            //     itemCount: 15,
-            //     itemBuilder: (context, index) {
-            //       return Card(
-            //         child: Column(
-            //           children: [
-            //             Text("#001", textAlign: TextAlign.end),
-            //           ],
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // )
+          ],
+        ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: FloatingActionButton(
+                    onPressed: () {},
+                    backgroundColor: Colors.transparent,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_downward_outlined,
+                        color: Color.fromRGBO(236, 3, 68, 1),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
