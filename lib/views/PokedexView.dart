@@ -17,21 +17,23 @@ class _PokedexState extends State<Pokedex> {
     super.initState();
     pokemonLista = PokedexService().buscandoDadosDosPokemons(contador);
   }
+
   Future<void> carregarMaisPokemons() async {
     contador += 15; // Incrementa o contador
 
     try {
-      final morePokemons =
+      final bucandoMaisPokemons =
           await PokedexService().buscandoDadosDosPokemons(contador);
 
       final listaAtualPokemon = await pokemonLista;
       final atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
-        ..addAll(morePokemons);
+        ..addAll(bucandoMaisPokemons);
       setState(() {
-        pokemonLista = Future.value(atualizaListaPokemonNaTela);//Atualizo os dados 
+        pokemonLista =
+            Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
       });
     } catch (e) {
-      contador -= 15;//Sempre volto 15 caso a chamada na api de exceção
+      contador -= 15; //Sempre volto 15 caso a chamada na api de exceção
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao carregar mais pokemons: $e'),
@@ -108,11 +110,39 @@ class _PokedexState extends State<Pokedex> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       // Enquanto o Future estiver esperando, exibir um indicador de carregamento
-                      return const Center(child: CircularProgressIndicator());// No centro para o usuario ter impressão de loading
-                    } else if (snapshot.hasError) {
-                      // Se ocorrer um erro durante a busca dos dados, exiba uma mensagem de erro
                       return const Center(
-                          child: Text('Erro ao carregar pokemons'));
+                          child:
+                              CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+                    } else if (snapshot.hasError) {
+
+                      return Column(
+                        children: [
+                          const Center(
+                            child: Text('Erro ao carregar pokemons'),
+                          ),
+                          Center(
+                            child: TextButton(
+                              onPressed: () async {
+                                //await pokemonLista;
+                                pokemonLista = PokedexService()
+                                    .buscandoDadosDosPokemons(contador = 0);
+                                setState(() {});
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  const Center(
+                                      child:
+                                        CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+                                }
+                              },
+                              child: const Text(
+                                "Clique aqui para carregar dados novamente",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          )
+                        ],
+                      );
                     } else {
                       // Se os dados forem carregados com sucesso, construa o GridView
                       final pokemonList =
