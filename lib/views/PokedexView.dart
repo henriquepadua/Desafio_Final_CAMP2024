@@ -19,39 +19,8 @@ class _PokedexState extends State<Pokedex> {
 
   void initState() {
     super.initState();
-    PokedexService().buscandoDadosDosPokemons();
+    PokedexService().buscandoDadosDosPokemons(10);
   }
-
-  // Future<void> buscandoDadosDosPokemons() async {
-  //   final response = await http
-  //       .get(Uri.parse('https://pokeapi.co/api/v2/pokemon?offset=0&limit=150'));
-
-  //   if (response.statusCode == 200) {
-  //     final jsonData = jsonDecode(response.body);
-  //     List<String> pokemonNames = [];
-  //     pokemonList = jsonData['results'];
-
-  //     for (var pokemon in pokemonList) {
-  //       pokemonNames.add(pokemon['name']);
-  //     }
-
-  //     for (var url in pokemonList) {
-  //       final responseurl = await http.get(Uri.parse(url['url']));
-
-  //       if (responseurl.statusCode == 200) {
-  //         final jsonDataurl = jsonDecode(responseurl.body);
-  //         final sprites = jsonDataurl['sprites'];
-
-  //         if (sprites != null) {
-  //           print(jsonDataurl['id']);
-  //           print(sprites['front_shiny']);
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     throw Exception('Não Encontrei nenhum pokemon');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +86,12 @@ class _PokedexState extends State<Pokedex> {
               child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3, childAspectRatio: 1.4),
-                  itemCount: 9,
+                  itemCount: 39,
                   itemBuilder: (context, index) {
                     return Card(
                       child: Column(
                         children: [
-                          Text("#001"),
+                          Text("#001",textAlign:TextAlign.end),
                         ],
                       ),
                     );
