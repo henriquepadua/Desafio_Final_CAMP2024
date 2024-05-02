@@ -114,7 +114,6 @@ class _PokedexState extends State<Pokedex> {
                           child:
                               CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
                     } else if (snapshot.hasError) {
-
                       return Column(
                         children: [
                           const Center(
@@ -131,7 +130,7 @@ class _PokedexState extends State<Pokedex> {
                                     ConnectionState.waiting) {
                                   const Center(
                                       child:
-                                        CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+                                          CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
                                 }
                               },
                               child: const Text(
@@ -145,7 +144,7 @@ class _PokedexState extends State<Pokedex> {
                       );
                     } else {
                       // Se os dados forem carregados com sucesso, construa o GridView
-                      final pokemonList =
+                      final pokemonLista =
                           snapshot.data ?? []; // Obtenha a lista de pokemons
                       return GridView.builder(
                         gridDelegate:
@@ -154,10 +153,10 @@ class _PokedexState extends State<Pokedex> {
                                 childAspectRatio: 1.2,
                                 mainAxisSpacing: 5,
                                 crossAxisSpacing: 5),
-                        itemCount: pokemonList
+                        itemCount: pokemonLista
                             .length, // Usar o comprimento da lista de pokemons
                         itemBuilder: (context, index) {
-                          final pokemon = pokemonList[index];
+                          final pokemon = pokemonLista[index];
                           return Card(
                             child: Column(
                               children: [
@@ -174,7 +173,7 @@ class _PokedexState extends State<Pokedex> {
                                   ],
                                 ),
                                 Image.network(
-                                  width: 60,
+                                  width: 50,
                                   pokemon.imageUrl,
                                 ),
                                 Container(
@@ -215,16 +214,7 @@ class _PokedexState extends State<Pokedex> {
               children: [
                 Center(
                   child: FloatingActionButton(
-                    onPressed: () async {
-                      print("passei aqui");
-                      carregarMaisPokemons();
-                      print("passei aqui");
-                      setState(() {
-                        print("passei aqui");
-                        carregarMaisPokemons();
-                        print("passei aqui");
-                      });
-                    },
+                    onPressed: () {},
                     backgroundColor: Colors.transparent,
                     child: IconButton(
                       icon: const Icon(

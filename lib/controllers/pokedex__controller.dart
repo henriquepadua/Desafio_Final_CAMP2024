@@ -25,7 +25,7 @@ class PokedexService {
 
         final responseurl = await http
             .get(Uri.parse(url))
-            .timeout(const Duration(seconds: 3), onTimeout: () {
+            .timeout(const Duration(seconds: 1), onTimeout: () {
           throw TimeoutException('A conexão excedeu o tempo limite');
         });
 
