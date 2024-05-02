@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:desafio_final_camp2024/models/Pokemon_model.dart';
+import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 
@@ -9,6 +10,7 @@ class PokedexService {
   Future<List<Pokemon>> buscandoDadosDosPokemons(int contador) async {
     List<Pokemon> pokemonList = [];
     List pokemons = [];
+    var imageUrl;
     final response = await http.get(Uri.parse(
         'https://pokeapi.co/api/v2/pokemon?offset=$contador&limit=15'));
 
@@ -22,7 +24,7 @@ class PokedexService {
 
         final responseurl = await http
             .get(Uri.parse(url))
-            .timeout(Duration(seconds: 10), onTimeout: () {
+            .timeout(const Duration(seconds: 10), onTimeout: () {
           throw TimeoutException('A conexão excedeu o tempo limite');
         });
 
@@ -30,7 +32,7 @@ class PokedexService {
           final jsonDataurl = jsonDecode(responseurl.body);
           final id = jsonDataurl['id'];
           final sprites = jsonDataurl['sprites'];
-          final imageUrl = sprites['front_shiny'];
+          if (sprites != null) imageUrl = sprites['front_default'];
 
           pokemonList.add(Pokemon(
             name: name,
@@ -38,7 +40,7 @@ class PokedexService {
             imageUrl: imageUrl,
           ));
 
-          print('Nome: $name, ID: $id, URL da Imagem: $imageUrl');
+          debugPrint('Nome: $name, ID: $id, URL da Imagem: $imageUrl');
         }
       }
     } else {
