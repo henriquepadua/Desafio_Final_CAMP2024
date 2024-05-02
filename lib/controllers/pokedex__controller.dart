@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:desafio_final_camp2024/models/Pokemon_model.dart';
@@ -18,7 +19,12 @@ class PokedexService {
       for (var pokemonData in pokemons) {
         final name = pokemonData['name'];
         final url = pokemonData['url'];
-        final responseurl = await http.get(Uri.parse(pokemonData['url']));
+
+        final responseurl = await http
+            .get(Uri.parse(url))
+            .timeout(Duration(seconds: 10), onTimeout: () {
+          throw TimeoutException('A conexão excedeu o tempo limite');
+        });
 
         if (responseurl.statusCode == 200) {
           final jsonDataurl = jsonDecode(responseurl.body);
