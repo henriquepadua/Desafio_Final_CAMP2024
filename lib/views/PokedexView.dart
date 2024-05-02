@@ -19,7 +19,7 @@ class _PokedexState extends State<Pokedex> {
 
   void initState() {
     super.initState();
-    PokedexService().buscandoDadosDosPokemons(10);
+    PokedexService().buscandoDadosDosPokemons(0);
   }
 
   @override
@@ -84,18 +84,19 @@ class _PokedexState extends State<Pokedex> {
             ),
             Expanded(
               child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, childAspectRatio: 1.4),
-                  itemCount: 39,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: Column(
-                        children: [
-                          Text("#001",textAlign:TextAlign.end),
-                        ],
-                      ),
-                    );
-                  }),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, childAspectRatio: 1.4),
+                itemCount: 39,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: Column(
+                      children: [
+                        Text("#001", textAlign: TextAlign.end),
+                      ],
+                    ),
+                  );
+                },
+              ),
             )
           ],
         ),

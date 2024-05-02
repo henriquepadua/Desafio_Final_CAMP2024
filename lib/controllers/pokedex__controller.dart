@@ -5,47 +5,39 @@ import 'package:desafio_final_camp2024/models/Pokemon_model.dart';
 import 'package:http/http.dart' as http;
 
 class PokedexService {
-  Future<void> buscandoDadosDosPokemons(int contador) async {
-    List pokemonList = [];
-    final response = await http.get(
-        Uri.parse('https://pokeapi.co/api/v2/pokemon?offset=$contador&limit=20'));
+  Future<List<Pokemon>> buscandoDadosDosPokemons(int contador) async {
+    List<Pokemon> pokemonList = [];
+    List pokemons = [];
+    final response = await http.get(Uri.parse(
+        'https://pokeapi.co/api/v2/pokemon?offset=$contador&limit=15'));
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      List<String> pokemonNames = [];
-      pokemonList = jsonData['results'];
+      pokemons = jsonData['results'];
 
-      for (var pokemon in pokemonList) {// pega todos os nomes
-        pokemonNames.add(pokemon['name']); //adiciona os nomes em uma lista
-        final responseurl = await http.get(Uri.parse(pokemon['url']));
+      for (var pokemonData in pokemons) {
+        final name = pokemonData['name'];
+        final url = pokemonData['url'];
+        final responseurl = await http.get(Uri.parse(pokemonData['url']));
 
         if (responseurl.statusCode == 200) {
-             final jsonDataurl = jsonDecode(responseurl.body);
-             final sprites = jsonDataurl['sprites'];
+          final jsonDataurl = jsonDecode(responseurl.body);
+          final id = jsonDataurl['id'];
+          final sprites = jsonDataurl['sprites'];
+          final imageUrl = sprites['front_shiny'];
 
-             if (sprites != null) {
-               print(pokemon['name']);
-               print(jsonDataurl['id']);
-               print(sprites['front_shiny']);
-             }
-           }
+          pokemonList.add(Pokemon(
+            name: name,
+            id: id,
+            imageUrl: imageUrl,
+          ));
+
+          print('Nome: $name, ID: $id, URL da Imagem: $imageUrl');
         }
-
-      // for (var url in pokemonList) {
-      //   final responseurl = await http.get(Uri.parse(url['url']));
-
-      //   if (responseurl.statusCode == 200) {
-      //     final jsonDataurl = jsonDecode(responseurl.body);
-      //     final sprites = jsonDataurl['sprites'];
-
-      //     if (sprites != null) {
-      //       print(jsonDataurl['id']);
-      //       print(sprites['front_shiny']);
-      //     }
-      //   }
-      // }
+      }
     } else {
       throw Exception('Não Encontrei nenhum pokemon');
     }
+    return pokemonList;
   }
 }
