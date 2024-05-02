@@ -10,7 +10,8 @@ class Pokedex extends StatefulWidget {
 class _PokedexState extends State<Pokedex> {
   TextEditingController pokemonController = TextEditingController();
   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
-  int contador = 0;
+  int contador = 0, contadorNome = 0;
+  bool retornoDoNome = false;
 
   @override
   void initState() {
@@ -39,6 +40,26 @@ class _PokedexState extends State<Pokedex> {
           content: Text('Erro ao carregar mais pokemons: $e'),
         ),
       );
+    }
+  }
+
+  Future<bool> carregarPokemonsPeloNome(String nomeDigitado) async {
+    try {
+      final pokemonsEncontrados = await PokedexService()
+          .buscandoPokemonsPeloNome(contadorNome, nomeDigitado);
+      print(pokemonsEncontrados.isEmpty);
+      setState(() {
+        pokemonLista = Future.value(pokemonsEncontrados);
+      });
+      return true;
+    } catch (e) {
+      contadorNome -= 15;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao carregar o pokemon: $e'),
+        ),
+      );
+      return false;
     }
   }
 
@@ -71,6 +92,18 @@ class _PokedexState extends State<Pokedex> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(50, 0, 20, 0),
                         child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              if (value.length > 3) {
+                                carregarPokemonsPeloNome(value);
+                                if (value.isNotEmpty) {}
+                              } else if (value.isEmpty) {
+                                // Se o texto digitado for menor que 3 caracteres, carregar todos os pokemons
+                                pokemonLista = PokedexService()
+                                    .buscandoDadosDosPokemons(contador);
+                              }
+                            });
+                          },
                           controller: pokemonController,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
