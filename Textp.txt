@@ -5,3 +5,4 @@ Passos:
 4- Pegar todos os dados OK
 5- Colocar cor de fundo no nome do pokemon  OK
 6- Pegar a cor de acordo com o Type
+7- Pegar dados páginados

@@ -9,12 +9,35 @@ class Pokedex extends StatefulWidget {
 
 class _PokedexState extends State<Pokedex> {
   TextEditingController pokemonController = TextEditingController();
-  late Future<List<Pokemon>> pokemonList; // Lista de Pokémon
+  late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
+  int contador = 0;
 
   @override
   void initState() {
     super.initState();
-    pokemonList = PokedexService().buscandoDadosDosPokemons(0);
+    pokemonLista = PokedexService().buscandoDadosDosPokemons(contador);
+  }
+  Future<void> carregarMaisPokemons() async {
+    contador += 15; // Incrementa o contador
+
+    try {
+      final morePokemons =
+          await PokedexService().buscandoDadosDosPokemons(contador);
+
+      final listaAtualPokemon = await pokemonLista;
+      final atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
+        ..addAll(morePokemons);
+      setState(() {
+        pokemonLista = Future.value(atualizaListaPokemonNaTela);//Atualizo os dados 
+      });
+    } catch (e) {
+      contador -= 15;//Sempre volto 15 caso a chamada na api de exceção
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao carregar mais pokemons: $e'),
+        ),
+      );
+    }
   }
 
   @override
@@ -81,15 +104,15 @@ class _PokedexState extends State<Pokedex> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 20, 2, 5),
                 child: FutureBuilder<List<Pokemon>>(
-                  future: pokemonList,
+                  future: pokemonLista,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       // Enquanto o Future estiver esperando, exibir um indicador de carregamento
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());// No centro para o usuario ter impressão de loading
                     } else if (snapshot.hasError) {
                       // Se ocorrer um erro durante a busca dos dados, exiba uma mensagem de erro
                       return const Center(
-                          child: Text('Erro ao carregar dados'));
+                          child: Text('Erro ao carregar pokemons'));
                     } else {
                       // Se os dados forem carregados com sucesso, construa o GridView
                       final pokemonList =
@@ -132,7 +155,7 @@ class _PokedexState extends State<Pokedex> {
                                       Container(
                                         color: Colors.blue,
                                         child: Text(
-                                          "#${pokemon.name}",
+                                          pokemon.name,
                                           textAlign: TextAlign.end,
                                           style: const TextStyle(
                                               color: Colors
@@ -162,14 +185,26 @@ class _PokedexState extends State<Pokedex> {
               children: [
                 Center(
                   child: FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      print("passei aqui");
+                      carregarMaisPokemons();
+                      print("passei aqui");
+                      setState(() {
+                        print("passei aqui");
+                        carregarMaisPokemons();
+                        print("passei aqui");
+                      });
+                    },
                     backgroundColor: Colors.transparent,
                     child: IconButton(
                       icon: const Icon(
                         Icons.arrow_downward_outlined,
                         color: Color.fromRGBO(236, 3, 68, 1),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await carregarMaisPokemons();
+                        setState(() {});
+                      },
                     ),
                   ),
                 ),
