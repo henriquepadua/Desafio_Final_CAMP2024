@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 
+import '../models/Pokemon_model.dart';
+
 class PokedexService {
   Future<List<Pokemon>> buscandoDadosDosPokemons(int contador) async {
     List<Pokemon> pokemonList = [];

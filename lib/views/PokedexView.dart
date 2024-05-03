@@ -12,6 +12,8 @@ class _PokedexState extends State<Pokedex> {
   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
   int contador = 0, contadorNome = 0;
   bool retornoDoNome = false;
+  List<Pokemon> pokemonsEncontrados = [];
+  List<Pokemon> listaAtualPokemon = [];
   List<Pokemon> atualizaListaPokemonNaTela = [];
 
   @override
@@ -48,7 +50,7 @@ class _PokedexState extends State<Pokedex> {
     try {
       List<Pokemon> pokemonsEncontrados = [];
 
-      final listaAtualPokemon = await pokemonLista;
+      listaAtualPokemon = await pokemonLista;
 
       pokemonsEncontrados = listaAtualPokemon
           .where((pokemon) =>
@@ -117,8 +119,13 @@ class _PokedexState extends State<Pokedex> {
                           onChanged: (value) {
                             if (value.isEmpty) {
                               setState(() {
-                                pokemonLista =
-                                    Future.value(atualizaListaPokemonNaTela);
+                                if (atualizaListaPokemonNaTela.length > 15) {
+                                  pokemonLista =
+                                      Future.value(atualizaListaPokemonNaTela);
+                                } else {
+                                  pokemonLista =
+                                      Future.value(listaAtualPokemon);
+                                }
                               });
                             }
                           },
@@ -128,10 +135,12 @@ class _PokedexState extends State<Pokedex> {
                                 _buscarPokemonPeloNome(value.trim());
                               });
                             } else {
-                              setState(() {
+                              if (atualizaListaPokemonNaTela.length > 15) {
                                 pokemonLista =
                                     Future.value(atualizaListaPokemonNaTela);
-                              });
+                              } else {
+                                pokemonLista = Future.value(listaAtualPokemon);
+                              }
                             }
                           },
                           controller: pokemonController,
