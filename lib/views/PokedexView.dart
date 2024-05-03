@@ -12,6 +12,7 @@ class _PokedexState extends State<Pokedex> {
   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
   int contador = 0, contadorNome = 0;
   bool retornoDoNome = false;
+  List<Pokemon> atualizaListaPokemonNaTela = [];
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _PokedexState extends State<Pokedex> {
           await PokedexService().buscandoDadosDosPokemons(contador);
 
       final listaAtualPokemon = await pokemonLista;
-      final atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
+      atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
         ..addAll(bucandoMaisPokemons);
       setState(() {
         pokemonLista =
@@ -116,20 +117,20 @@ class _PokedexState extends State<Pokedex> {
                           onChanged: (value) {
                             if (value.isEmpty) {
                               setState(() {
-                                pokemonLista = PokedexService()
-                                    .buscandoDadosDosPokemons(contadorNome);
+                                pokemonLista =
+                                    Future.value(atualizaListaPokemonNaTela);
                               });
                             }
                           },
                           onSubmitted: (value) async {
                             if (value.length > 2) {
                               setState(() {
-                                _buscarPokemonPeloNome(value);
+                                _buscarPokemonPeloNome(value.trim());
                               });
                             } else {
                               setState(() {
-                                pokemonLista = PokedexService()
-                                    .buscandoDadosDosPokemons(contador);
+                                pokemonLista =
+                                    Future.value(atualizaListaPokemonNaTela);
                               });
                             }
                           },
