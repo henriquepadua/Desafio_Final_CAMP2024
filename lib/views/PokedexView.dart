@@ -43,45 +43,16 @@ class _PokedexState extends State<Pokedex> {
     }
   }
 
-  // Future<void> carregarMaisPokemons() async {
-  //   contador += 15; // Incrementa o contador
-
-  //   try {
-  //     // final bucandoMaisPokemons =
-  //     //     await PokedexService().buscandoDadosDosPokemons(contador);
-
-  //     // final listaAtualPokemon = await pokemonLista;
-  //     // final atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
-  //     //   ..addAll(bucandoMaisPokemons);
-  //     // ignore: unused_local_variable
-  //     var valor = await pokemonLista;
-  //     for (var pokemon in await pokemonLista) {
-  //       print(pokemon.name);
-  //     }
-  //     //  setState(() {
-  //     //   pokemonLista =
-  //     //       Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
-  //     // });
-  //   } catch (e) {
-  //     contador -= 15; //Sempre volto 15 caso a chamada na api de exceção
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Erro ao carregar mais pokemons: $e'),
-  //       ),
-  //     );
-  //   }
-  // }
-
-  Future<bool> carregarPokemonsPeloNome(
-      String nomeDigitado, int contadorPassado) async {
+  Future<bool> carregarPokemonsPeloNome(String nomeDigitado) async {
     try {
-      contadorNome = 0; // Reinicia o contadorNome
       List<Pokemon> pokemonsEncontrados = [];
 
-      // Itera sobre todos os nomes de pokémon disponíveis
-      final pokemonsTemp =
-          await PokedexService().buscandoPokemonsPeloNome(0, nomeDigitado);
-      pokemonsEncontrados.addAll(pokemonsTemp);
+      final listaAtualPokemon = await pokemonLista;
+
+      pokemonsEncontrados = listaAtualPokemon
+          .where((pokemon) =>
+              pokemon.name.toLowerCase().contains(nomeDigitado.toLowerCase()))
+          .toList();
 
       if (pokemonsEncontrados.isEmpty) {
         return false;
@@ -93,7 +64,6 @@ class _PokedexState extends State<Pokedex> {
 
       return true;
     } catch (e) {
-      contadorNome -= 15;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao carregar o pokemon: $e'),
@@ -104,7 +74,7 @@ class _PokedexState extends State<Pokedex> {
   }
 
   Future<void> _buscarPokemonPeloNome(String nome) async {
-    bool retorno = await carregarPokemonsPeloNome(nome, contadorNome);
+    bool retorno = await carregarPokemonsPeloNome(nome);
     if (!retorno) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -180,9 +150,6 @@ class _PokedexState extends State<Pokedex> {
                                 color: Color.fromRGBO(236, 3, 68, 1),
                               ),
                             ),
-                          ),
-                          style: const TextStyle(
-                            color: Color.fromRGBO(236, 3, 68, 1),
                           ),
                         ),
                       ),
