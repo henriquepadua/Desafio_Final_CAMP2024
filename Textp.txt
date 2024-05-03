@@ -1,8 +1,7 @@
-Passos:
-1- Pegar dados da API e entende-la muito bem OK
-2- desenhar no caderno como faria cada parte do projeto OK
-3- fazer a parte da tela principal que reenderiza OK
-4- Pegar todos os dados OK
-5- Colocar cor de fundo no nome do pokemon  OK
-6- Pegar a cor de acordo com o Type
-7- Pegar dados páginados
+Tela de login:
+Para a lista de tarefas faria um icon para pegar a logo da ioasys e um texto ao lado com padding horizontal de 5,
+Fazendo um padding de 30 vertical pegaria Mais dois textos só que dentro de uma coluna
+Em baixo com outro padding de 15 vertical pegaria dois textfield cada um com um padding de 10,
+Novamente com um padding de 15 vertical pego um textbutton para quando usuario pressinar busco na api o valor retornado e navego para tela de status code.
+
+Barra de Status Code pego minha imagem com Image e deixo com width: 300, em baixo o valor da minha resposta dentro de uma coluna junto com o text("OK") novamente um padding e um valor para pegar o status assim que digitar.

@@ -63,7 +63,7 @@ class PokedexService {
     // ignore: prefer_typing_uninitialized_variables
     var imageUrl, type;
     final response = await http.get(Uri.parse(
-        'https://pokeapi.co/api/v2/pokemon?offset=$contador&limit=15'));
+        'https://pokeapi.co/api/v2/pokemon?offset=0&limit=150'));
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);

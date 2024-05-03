@@ -43,14 +43,54 @@ class _PokedexState extends State<Pokedex> {
     }
   }
 
-  Future<bool> carregarPokemonsPeloNome(String nomeDigitado) async {
+  // Future<void> carregarMaisPokemons() async {
+  //   contador += 15; // Incrementa o contador
+
+  //   try {
+  //     // final bucandoMaisPokemons =
+  //     //     await PokedexService().buscandoDadosDosPokemons(contador);
+
+  //     // final listaAtualPokemon = await pokemonLista;
+  //     // final atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
+  //     //   ..addAll(bucandoMaisPokemons);
+  //     // ignore: unused_local_variable
+  //     var valor = await pokemonLista;
+  //     for (var pokemon in await pokemonLista) {
+  //       print(pokemon.name);
+  //     }
+  //     //  setState(() {
+  //     //   pokemonLista =
+  //     //       Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
+  //     // });
+  //   } catch (e) {
+  //     contador -= 15; //Sempre volto 15 caso a chamada na api de exceção
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Erro ao carregar mais pokemons: $e'),
+  //       ),
+  //     );
+  //   }
+  // }
+
+  Future<bool> carregarPokemonsPeloNome(
+      String nomeDigitado, int contadorPassado) async {
     try {
-      final pokemonsEncontrados = await PokedexService()
-          .buscandoPokemonsPeloNome(contadorNome, nomeDigitado);
-      print(pokemonsEncontrados.isEmpty);
+      contadorNome = 0; // Reinicia o contadorNome
+      List<Pokemon> pokemonsEncontrados = [];
+
+      // Itera sobre todos os nomes de pokémon disponíveis
+      final pokemonsTemp =
+          await PokedexService().buscandoPokemonsPeloNome(0, nomeDigitado);
+      pokemonsEncontrados.addAll(pokemonsTemp);
+
+      if (pokemonsEncontrados.isEmpty) {
+        return false;
+      }
+
       setState(() {
         pokemonLista = Future.value(pokemonsEncontrados);
       });
+
       return true;
     } catch (e) {
       contadorNome -= 15;
@@ -60,6 +100,17 @@ class _PokedexState extends State<Pokedex> {
         ),
       );
       return false;
+    }
+  }
+
+  Future<void> _buscarPokemonPeloNome(String nome) async {
+    bool retorno = await carregarPokemonsPeloNome(nome, contadorNome);
+    if (!retorno) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pokemon não encontrado'),
+        ),
+      );
     }
   }
 
@@ -93,16 +144,24 @@ class _PokedexState extends State<Pokedex> {
                         padding: const EdgeInsets.fromLTRB(50, 0, 20, 0),
                         child: TextField(
                           onChanged: (value) {
-                            setState(() {
-                              if (value.length > 3) {
-                                carregarPokemonsPeloNome(value);
-                                if (value.isNotEmpty) {}
-                              } else if (value.isEmpty) {
-                                // Se o texto digitado for menor que 3 caracteres, carregar todos os pokemons
+                            if (value.isEmpty) {
+                              setState(() {
+                                pokemonLista = PokedexService()
+                                    .buscandoDadosDosPokemons(contadorNome);
+                              });
+                            }
+                          },
+                          onSubmitted: (value) async {
+                            if (value.length > 2) {
+                              setState(() {
+                                _buscarPokemonPeloNome(value);
+                              });
+                            } else {
+                              setState(() {
                                 pokemonLista = PokedexService()
                                     .buscandoDadosDosPokemons(contador);
-                              }
-                            });
+                              });
+                            }
                           },
                           controller: pokemonController,
                           textAlign: TextAlign.center,
@@ -184,50 +243,61 @@ class _PokedexState extends State<Pokedex> {
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
                                 childAspectRatio: 1.2,
-                                mainAxisSpacing: 5,
-                                crossAxisSpacing: 5),
+                                mainAxisSpacing: 1,
+                                crossAxisSpacing: 1),
                         itemCount: pokemonLista
                             .length, // Usar o comprimento da lista de pokemons
                         itemBuilder: (context, index) {
                           final pokemon = pokemonLista[index];
-                          return Card(
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "#${pokemon.id}",
-                                      textAlign: TextAlign.end,
-                                      style:
-                                          const TextStyle(color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                                Image.network(
-                                  width: 50,
-                                  pokemon.imageUrl,
-                                ),
-                                Container(
-                                  color: Colors.blue,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                          return Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Card(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .center, // Centraliza na vertical
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        color: Colors.blue,
-                                        child: Text(
-                                          pokemon.name,
-                                          textAlign: TextAlign.end,
-                                          style: const TextStyle(
-                                              color: Colors
-                                                  .white), // Define a cor do texto como branca
-                                        ),
+                                      Text(
+                                        "#${pokemon.id}",
+                                        textAlign: TextAlign.end,
+                                        style:
+                                            const TextStyle(color: Colors.blue),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Image.network(
+                                      width: 50,
+                                      pokemon.imageUrl,
+                                    ),
+                                  ),
+                                  Container(
+                                    color: Colors.blue,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          color: Colors.blue,
+                                          child: Text(
+                                            pokemon.name,
+                                            textAlign: TextAlign.end,
+                                            style: const TextStyle(
+                                                color: Colors
+                                                    .white), // Define a cor do texto como branca
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
