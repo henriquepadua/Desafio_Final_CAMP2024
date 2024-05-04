@@ -6,10 +6,19 @@ class Pokemon {
   final String name;
   final int id;
   final String imageUrl;
+  final int primeiroValorCor;
+  final int segundoValorCor;
+  final int terceiroValorCor;
+  final double quartoValorCor;
 
   Pokemon({
     required this.name,
     required this.id,
     required this.imageUrl,
+    required this.primeiroValorCor,
+    required this.segundoValorCor,
+    required this.terceiroValorCor,
+    required this.quartoValorCor,
+    //required this.color,
   });
 }

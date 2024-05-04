@@ -242,7 +242,7 @@ class _PokedexState extends State<Pokedex> {
                                         "#${pokemon.id}",
                                         textAlign: TextAlign.end,
                                         style:
-                                            const TextStyle(color: Colors.blue),
+                                            TextStyle(color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor)),
                                       ),
                                     ],
                                   ),
@@ -250,18 +250,18 @@ class _PokedexState extends State<Pokedex> {
                                     padding:
                                         const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                     child: Image.network(
-                                      width: 50,
+                                      width: 49,
                                       pokemon.imageUrl,
                                     ),
                                   ),
                                   Container(
-                                    color: Colors.blue,
+                                    color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          color: Colors.blue,
+                                          //color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor),
                                           child: Text(
                                             pokemon.name,
                                             textAlign: TextAlign.end,
