@@ -1,6 +1,7 @@
+import 'package:desafio_final_camp2024/controllers/pokedex__controller.dart';
 import 'package:desafio_final_camp2024/models/Pokemon_model.dart';
 import 'package:flutter/material.dart';
-import 'package:desafio_final_camp2024/controllers/pokedex__controller.dart';
+import 'package:flutter/widgets.dart';
 
 class Pokedex extends StatefulWidget {
   @override
@@ -8,8 +9,12 @@ class Pokedex extends StatefulWidget {
 }
 
 class _PokedexState extends State<Pokedex> {
+  bool isDarkOverlayVisible =
+      false; // Variável para controlar a visibilidade do overlay
   TextEditingController pokemonController = TextEditingController();
   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
+  String _mensagem =
+      "Pokemon não encontrado"; // Variável de estado para armazenar a mensagem
   int contador = 0, contadorNome = 0;
   bool retornoDoNome = false;
   List<Pokemon> pokemonsEncontrados = [];
@@ -19,7 +24,7 @@ class _PokedexState extends State<Pokedex> {
   @override
   void initState() {
     super.initState();
-    pokemonLista = PokedexService().buscandoDadosDosPokemons(contador);
+    pokemonLista = PokedexController().buscandoDadosDosPokemons(contador);
   }
 
   Future<void> carregarMaisPokemons() async {
@@ -27,7 +32,7 @@ class _PokedexState extends State<Pokedex> {
 
     try {
       final bucandoMaisPokemons =
-          await PokedexService().buscandoDadosDosPokemons(contador);
+          await PokedexController().buscandoDadosDosPokemons(contador);
 
       final listaAtualPokemon = await pokemonLista;
       atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
@@ -76,11 +81,53 @@ class _PokedexState extends State<Pokedex> {
     }
   }
 
+  Future<bool> carregarPokemonsPeloId(int idDigitado) async {
+    try {
+      List<Pokemon> pokemonsEncontrados = [];
+
+      listaAtualPokemon = await pokemonLista;
+
+      pokemonsEncontrados = listaAtualPokemon
+          .where((pokemon) => pokemon.id == idDigitado)
+          .toList();
+
+      if (pokemonsEncontrados.isEmpty) {
+        return false;
+      }
+
+      setState(() {
+        pokemonLista = Future.value(pokemonsEncontrados);
+      });
+
+      return true;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao carregar o pokemon: $e'),
+        ),
+      );
+      return false;
+    }
+  }
+
   Future<void> _buscarPokemonPeloNome(String nome) async {
     bool retorno = await carregarPokemonsPeloNome(nome);
     if (!retorno) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
+          content: Text('Pokemon não encontrado'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _buscarPokemonPeloId(int id) async {
+    bool retorno = await carregarPokemonsPeloId(id);
+    if (!retorno) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
           content: Text('Pokemon não encontrado'),
         ),
       );
@@ -104,7 +151,14 @@ class _PokedexState extends State<Pokedex> {
                     Image.asset("assets/Group17.png"),
                     const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 25)),
-                    Image.asset("assets/Switch.png")
+                    IconButton(
+                      icon: const Icon(Icons.cached_rounded),
+                      onPressed: () {
+                        setState(() {
+                          isDarkOverlayVisible = !isDarkOverlayVisible;
+                        });
+                      },
+                    ) //.asset("assets/Switch.png")
                   ],
                 ),
                 const Padding(
@@ -130,9 +184,13 @@ class _PokedexState extends State<Pokedex> {
                             }
                           },
                           onSubmitted: (value) async {
-                            if (value.length > 2) {
+                            if (value.isNotEmpty) {
                               setState(() {
-                                _buscarPokemonPeloNome(value.trim());
+                                if (int.tryParse(value) == null) {
+                                  _buscarPokemonPeloNome(value.trim());
+                                } else {
+                                  _buscarPokemonPeloId(int.parse(value));
+                                }
                               });
                             } else {
                               if (atualizaListaPokemonNaTela.length > 15) {
@@ -192,7 +250,7 @@ class _PokedexState extends State<Pokedex> {
                             child: TextButton(
                               onPressed: () async {
                                 //await pokemonLista;
-                                pokemonLista = PokedexService()
+                                pokemonLista = PokedexController()
                                     .buscandoDadosDosPokemons(contador = 0);
                                 setState(() {});
                                 if (snapshot.connectionState ==
@@ -241,8 +299,12 @@ class _PokedexState extends State<Pokedex> {
                                       Text(
                                         "#${pokemon.id}",
                                         textAlign: TextAlign.end,
-                                        style:
-                                            TextStyle(color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor)),
+                                        style: TextStyle(
+                                            color: Color.fromRGBO(
+                                                pokemon.primeiroValorCor,
+                                                pokemon.segundoValorCor,
+                                                pokemon.terceiroValorCor,
+                                                pokemon.quartoValorCor)),
                                       ),
                                     ],
                                   ),
@@ -255,20 +317,21 @@ class _PokedexState extends State<Pokedex> {
                                     ),
                                   ),
                                   Container(
-                                    color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor),
+                                    color: Color.fromRGBO(
+                                        pokemon.primeiroValorCor,
+                                        pokemon.segundoValorCor,
+                                        pokemon.terceiroValorCor,
+                                        pokemon.quartoValorCor),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          //color: Color.fromRGBO(pokemon.primeiroValorCor, pokemon.segundoValorCor, pokemon.terceiroValorCor, pokemon.quartoValorCor),
-                                          child: Text(
-                                            pokemon.name,
-                                            textAlign: TextAlign.end,
-                                            style: const TextStyle(
-                                                color: Colors
-                                                    .white), // Define a cor do texto como branca
-                                          ),
+                                        Text(
+                                          pokemon.name,
+                                          textAlign: TextAlign.end,
+                                          style: const TextStyle(
+                                              color: Colors
+                                                  .white), // Define a cor do texto como branca
                                         ),
                                       ],
                                     ),

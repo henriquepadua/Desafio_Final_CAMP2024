@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class Pokemon {
   final String name;
-  final int id;
+  int id;
   final String imageUrl;
   final int primeiroValorCor;
   final int segundoValorCor;
@@ -19,6 +19,5 @@ class Pokemon {
     required this.segundoValorCor,
     required this.terceiroValorCor,
     required this.quartoValorCor,
-    //required this.color,
   });
 }
