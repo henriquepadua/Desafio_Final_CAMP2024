@@ -1,4 +1,4 @@
-import 'package:desafio_final_camp2024/views/PokedexView.dart';
+import 'package:Desafio_Final_CAMP2024/views/PokedexView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

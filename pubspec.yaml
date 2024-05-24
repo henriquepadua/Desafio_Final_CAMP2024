@@ -1,4 +1,4 @@
-name: desafio_final_camp2024
+name: Desafio_Final_CAMP2024
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -39,10 +39,14 @@ dependencies:
   cached_network_image: ^3.1.0
   shared_preferences: ^2.0.9
   http: ^1.2.1
+  retry: ^3.0.1
+  dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  http_mock_adapter: ^0.3.0  # Para simulação de respostas HTTP em testes
+  test: ^1.16.0  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

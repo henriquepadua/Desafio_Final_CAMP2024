@@ -1,7 +1,9 @@
-import 'package:desafio_final_camp2024/controllers/pokedex__controller.dart';
-import 'package:desafio_final_camp2024/models/Pokemon_model.dart';
+
+import 'package:Desafio_Final_CAMP2024/controllers/pokedex__controller.dart';
+import 'package:Desafio_Final_CAMP2024/models/Pokemon_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:dio/dio.dart';
 
 class Pokedex extends StatefulWidget {
   @override
@@ -9,37 +11,36 @@ class Pokedex extends StatefulWidget {
 }
 
 class _PokedexState extends State<Pokedex> {
-  bool isDarkOverlayVisible =
-      false; // Variável para controlar a visibilidade do overlay
+  bool isDarkOverlayVisible = false; // Variável para controlar a visibilidade do overlay
   TextEditingController pokemonController = TextEditingController();
   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
-  String _mensagem =
-      "Pokemon não encontrado"; // Variável de estado para armazenar a mensagem
+  String _mensagem = "Pokemon não encontrado"; // Variável de estado para armazenar a mensagem
   int contador = 0, contadorNome = 0;
   bool retornoDoNome = false;
   List<Pokemon> pokemonsEncontrados = [];
   List<Pokemon> listaAtualPokemon = [];
   List<Pokemon> atualizaListaPokemonNaTela = [];
+  late Dio dio; // Declare Dio instance
+  late PokedexController pokedexController; // Declare PokedexController instance
 
   @override
   void initState() {
     super.initState();
-    pokemonLista = PokedexController().buscandoDadosDosPokemons(contador);
+    dio = Dio(); // Initialize Dio instance
+    pokedexController = PokedexController(dio: dio); // Initialize PokedexController with dio
+    pokemonLista = pokedexController.buscandoDadosDosPokemons(contador);
   }
 
   Future<void> carregarMaisPokemons() async {
     contador += 15; // Incrementa o contador
 
     try {
-      final bucandoMaisPokemons =
-          await PokedexController().buscandoDadosDosPokemons(contador);
+      final bucandoMaisPokemons = await pokedexController.buscandoDadosDosPokemons(contador);
 
       final listaAtualPokemon = await pokemonLista;
-      atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
-        ..addAll(bucandoMaisPokemons);
+      atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)..addAll(bucandoMaisPokemons);
       setState(() {
-        pokemonLista =
-            Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
+        pokemonLista = Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
       });
     } catch (e) {
       contador -= 15; //Sempre volto 15 caso a chamada na api de exceção
@@ -58,8 +59,7 @@ class _PokedexState extends State<Pokedex> {
       listaAtualPokemon = await pokemonLista;
 
       pokemonsEncontrados = listaAtualPokemon
-          .where((pokemon) =>
-              pokemon.name.toLowerCase().contains(nomeDigitado.toLowerCase()))
+          .where((pokemon) => pokemon.name.toLowerCase().contains(nomeDigitado.toLowerCase()))
           .toList();
 
       if (pokemonsEncontrados.isEmpty) {
@@ -87,9 +87,7 @@ class _PokedexState extends State<Pokedex> {
 
       listaAtualPokemon = await pokemonLista;
 
-      pokemonsEncontrados = listaAtualPokemon
-          .where((pokemon) => pokemon.id == idDigitado)
-          .toList();
+      pokemonsEncontrados = listaAtualPokemon.where((pokemon) => pokemon.id == idDigitado).toList();
 
       if (pokemonsEncontrados.isEmpty) {
         return false;
@@ -113,7 +111,6 @@ class _PokedexState extends State<Pokedex> {
   Future<void> _buscarPokemonPeloNome(String nome) async {
     bool retorno = await carregarPokemonsPeloNome(nome);
     if (!retorno) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Pokemon não encontrado'),
@@ -125,7 +122,6 @@ class _PokedexState extends State<Pokedex> {
   Future<void> _buscarPokemonPeloId(int id) async {
     bool retorno = await carregarPokemonsPeloId(id);
     if (!retorno) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Pokemon não encontrado'),
@@ -146,11 +142,9 @@ class _PokedexState extends State<Pokedex> {
                 const Padding(padding: EdgeInsets.fromLTRB(0, 50, 0, 0)),
                 Row(
                   children: [
-                    const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20)),
+                    const Padding(padding: EdgeInsets.symmetric(horizontal: 20)),
                     Image.asset("assets/Group17.png"),
-                    const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25)),
+                    const Padding(padding: EdgeInsets.symmetric(horizontal: 25)),
                     IconButton(
                       icon: const Icon(Icons.cached_rounded),
                       onPressed: () {
@@ -174,11 +168,9 @@ class _PokedexState extends State<Pokedex> {
                             if (value.isEmpty) {
                               setState(() {
                                 if (atualizaListaPokemonNaTela.length > 15) {
-                                  pokemonLista =
-                                      Future.value(atualizaListaPokemonNaTela);
+                                  pokemonLista = Future.value(atualizaListaPokemonNaTela);
                                 } else {
-                                  pokemonLista =
-                                      Future.value(listaAtualPokemon);
+                                  pokemonLista = Future.value(listaAtualPokemon);
                                 }
                               });
                             }
@@ -194,8 +186,7 @@ class _PokedexState extends State<Pokedex> {
                               });
                             } else {
                               if (atualizaListaPokemonNaTela.length > 15) {
-                                pokemonLista =
-                                    Future.value(atualizaListaPokemonNaTela);
+                                pokemonLista = Future.value(atualizaListaPokemonNaTela);
                               } else {
                                 pokemonLista = Future.value(listaAtualPokemon);
                               }
@@ -210,9 +201,10 @@ class _PokedexState extends State<Pokedex> {
                             hintText: "Buscar pokemon",
                             labelText: "Buscar",
                             labelStyle: TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(236, 3, 68, 1)),
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(236, 3, 68, 1),
+                            ),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color.fromRGBO(236, 3, 68, 1),
@@ -223,8 +215,9 @@ class _PokedexState extends State<Pokedex> {
                       ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
-                        child: Image.asset("assets/heart.png")),
+                      padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+                      child: Image.asset("assets/heart.png"),
+                    ),
                   ],
                 ),
               ],
@@ -237,9 +230,7 @@ class _PokedexState extends State<Pokedex> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       // Enquanto o Future estiver esperando, exibir um indicador de carregamento
-                      return const Center(
-                          child:
-                              CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+                      return const Center(child: CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
                     } else if (snapshot.hasError) {
                       return Column(
                         children: [
@@ -250,20 +241,15 @@ class _PokedexState extends State<Pokedex> {
                             child: TextButton(
                               onPressed: () async {
                                 //await pokemonLista;
-                                pokemonLista = PokedexController()
-                                    .buscandoDadosDosPokemons(contador = 0);
+                                pokemonLista = pokedexController.buscandoDadosDosPokemons(contador = 0);
                                 setState(() {});
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  const Center(
-                                      child:
-                                          CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  const Center(child: CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
                                 }
                               },
                               child: const Text(
                                 "Clique aqui para carregar dados novamente",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ),
                           )
@@ -271,46 +257,43 @@ class _PokedexState extends State<Pokedex> {
                       );
                     } else {
                       // Se os dados forem carregados com sucesso, construa o GridView
-                      final pokemonLista =
-                          snapshot.data ?? []; // Obtenha a lista de pokemons
+                      final pokemonLista = snapshot.data ?? []; // Obtenha a lista de pokemons
                       return GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 1.2,
-                                mainAxisSpacing: 1,
-                                crossAxisSpacing: 1),
-                        itemCount: pokemonLista
-                            .length, // Usar o comprimento da lista de pokemons
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 1.2,
+                          mainAxisSpacing: 1,
+                          crossAxisSpacing: 1,
+                        ),
+                        itemCount: pokemonLista.length, // Usar o comprimento da lista de pokemons
                         itemBuilder: (context, index) {
                           final pokemon = pokemonLista[index];
                           return Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Card(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .center, // Centraliza na vertical
+                                mainAxisAlignment: MainAxisAlignment.center, // Centraliza na vertical
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         "#${pokemon.id}",
                                         textAlign: TextAlign.end,
                                         style: TextStyle(
-                                            color: Color.fromRGBO(
-                                                pokemon.primeiroValorCor,
-                                                pokemon.segundoValorCor,
-                                                pokemon.terceiroValorCor,
-                                                pokemon.quartoValorCor)),
+                                          color: Color.fromRGBO(
+                                            pokemon.primeiroValorCor,
+                                            pokemon.segundoValorCor,
+                                            pokemon.terceiroValorCor,
+                                            pokemon.quartoValorCor,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                     child: Image.network(
                                       width: 49,
                                       pokemon.imageUrl,
@@ -318,20 +301,20 @@ class _PokedexState extends State<Pokedex> {
                                   ),
                                   Container(
                                     color: Color.fromRGBO(
-                                        pokemon.primeiroValorCor,
-                                        pokemon.segundoValorCor,
-                                        pokemon.terceiroValorCor,
-                                        pokemon.quartoValorCor),
+                                      pokemon.primeiroValorCor,
+                                      pokemon.segundoValorCor,
+                                      pokemon.terceiroValorCor,
+                                      pokemon.quartoValorCor,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           pokemon.name,
                                           textAlign: TextAlign.end,
                                           style: const TextStyle(
-                                              color: Colors
-                                                  .white), // Define a cor do texto como branca
+                                            color: Colors.white, // Define a cor do texto como branca
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -379,3 +362,385 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 }
+
+
+// import 'package:Desafio_Final_CAMP2024/controllers/pokedex__controller.dart';
+// import 'package:Desafio_Final_CAMP2024/models/Pokemon_model.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/widgets.dart';
+
+// class Pokedex extends StatefulWidget {
+//   @override
+//   _PokedexState createState() => _PokedexState();
+// }
+
+// class _PokedexState extends State<Pokedex> {
+//   bool isDarkOverlayVisible =
+//       false; // Variável para controlar a visibilidade do overlay
+//   TextEditingController pokemonController = TextEditingController();
+//   late Future<List<Pokemon>> pokemonLista; // Lista de Pokémon
+//   String _mensagem =
+//       "Pokemon não encontrado"; // Variável de estado para armazenar a mensagem
+//   int contador = 0, contadorNome = 0;
+//   bool retornoDoNome = false;
+//   List<Pokemon> pokemonsEncontrados = [];
+//   List<Pokemon> listaAtualPokemon = [];
+//   List<Pokemon> atualizaListaPokemonNaTela = [];
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     pokemonLista = PokedexController().buscandoDadosDosPokemons(contador);
+//   }
+
+//   Future<void> carregarMaisPokemons() async {
+//     contador += 15; // Incrementa o contador
+
+//     try {
+//       final bucandoMaisPokemons =
+//           await PokedexController().buscandoDadosDosPokemons(contador);
+
+//       final listaAtualPokemon = await pokemonLista;
+//       atualizaListaPokemonNaTela = List<Pokemon>.from(listaAtualPokemon)
+//         ..addAll(bucandoMaisPokemons);
+//       setState(() {
+//         pokemonLista =
+//             Future.value(atualizaListaPokemonNaTela); //Atualizo os dados
+//       });
+//     } catch (e) {
+//       contador -= 15; //Sempre volto 15 caso a chamada na api de exceção
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Erro ao carregar mais pokemons: $e'),
+//         ),
+//       );
+//     }
+//   }
+
+//   Future<bool> carregarPokemonsPeloNome(String nomeDigitado) async {
+//     try {
+//       List<Pokemon> pokemonsEncontrados = [];
+
+//       listaAtualPokemon = await pokemonLista;
+
+//       pokemonsEncontrados = listaAtualPokemon
+//           .where((pokemon) =>
+//               pokemon.name.toLowerCase().contains(nomeDigitado.toLowerCase()))
+//           .toList();
+
+//       if (pokemonsEncontrados.isEmpty) {
+//         return false;
+//       }
+
+//       setState(() {
+//         pokemonLista = Future.value(pokemonsEncontrados);
+//       });
+
+//       return true;
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Erro ao carregar o pokemon: $e'),
+//         ),
+//       );
+//       return false;
+//     }
+//   }
+
+//   Future<bool> carregarPokemonsPeloId(int idDigitado) async {
+//     try {
+//       List<Pokemon> pokemonsEncontrados = [];
+
+//       listaAtualPokemon = await pokemonLista;
+
+//       pokemonsEncontrados = listaAtualPokemon
+//           .where((pokemon) => pokemon.id == idDigitado)
+//           .toList();
+
+//       if (pokemonsEncontrados.isEmpty) {
+//         return false;
+//       }
+
+//       setState(() {
+//         pokemonLista = Future.value(pokemonsEncontrados);
+//       });
+
+//       return true;
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Erro ao carregar o pokemon: $e'),
+//         ),
+//       );
+//       return false;
+//     }
+//   }
+
+//   Future<void> _buscarPokemonPeloNome(String nome) async {
+//     bool retorno = await carregarPokemonsPeloNome(nome);
+//     if (!retorno) {
+//       // ignore: use_build_context_synchronously
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Pokemon não encontrado'),
+//         ),
+//       );
+//     }
+//   }
+
+//   Future<void> _buscarPokemonPeloId(int id) async {
+//     bool retorno = await carregarPokemonsPeloId(id);
+//     if (!retorno) {
+//       // ignore: use_build_context_synchronously
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Pokemon não encontrado'),
+//         ),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         body: Column(
+//           children: [
+//             Image.asset("assets/Rectangle15.png"),
+//             Column(
+//               children: [
+//                 const Padding(padding: EdgeInsets.fromLTRB(0, 50, 0, 0)),
+//                 Row(
+//                   children: [
+//                     const Padding(
+//                         padding: EdgeInsets.symmetric(horizontal: 20)),
+//                     Image.asset("assets/Group17.png"),
+//                     const Padding(
+//                         padding: EdgeInsets.symmetric(horizontal: 25)),
+//                     IconButton(
+//                       icon: const Icon(Icons.cached_rounded),
+//                       onPressed: () {
+//                         setState(() {
+//                           isDarkOverlayVisible = !isDarkOverlayVisible;
+//                         });
+//                       },
+//                     ) //.asset("assets/Switch.png")
+//                   ],
+//                 ),
+//                 const Padding(
+//                   padding: EdgeInsets.symmetric(vertical: 25),
+//                 ),
+//                 Row(
+//                   children: [
+//                     Expanded(
+//                       child: Padding(
+//                         padding: const EdgeInsets.fromLTRB(50, 0, 20, 0),
+//                         child: TextField(
+//                           onChanged: (value) {
+//                             if (value.isEmpty) {
+//                               setState(() {
+//                                 if (atualizaListaPokemonNaTela.length > 15) {
+//                                   pokemonLista =
+//                                       Future.value(atualizaListaPokemonNaTela);
+//                                 } else {
+//                                   pokemonLista =
+//                                       Future.value(listaAtualPokemon);
+//                                 }
+//                               });
+//                             }
+//                           },
+//                           onSubmitted: (value) async {
+//                             if (value.isNotEmpty) {
+//                               setState(() {
+//                                 if (int.tryParse(value) == null) {
+//                                   _buscarPokemonPeloNome(value.trim());
+//                                 } else {
+//                                   _buscarPokemonPeloId(int.parse(value));
+//                                 }
+//                               });
+//                             } else {
+//                               if (atualizaListaPokemonNaTela.length > 15) {
+//                                 pokemonLista =
+//                                     Future.value(atualizaListaPokemonNaTela);
+//                               } else {
+//                                 pokemonLista = Future.value(listaAtualPokemon);
+//                               }
+//                             }
+//                           },
+//                           controller: pokemonController,
+//                           textAlign: TextAlign.center,
+//                           textAlignVertical: TextAlignVertical.center,
+//                           decoration: const InputDecoration(
+//                             suffixIcon: Icon(Icons.search),
+//                             suffixIconColor: Color.fromRGBO(236, 3, 68, 1),
+//                             hintText: "Buscar pokemon",
+//                             labelText: "Buscar",
+//                             labelStyle: TextStyle(
+//                                 fontSize: 23,
+//                                 fontWeight: FontWeight.bold,
+//                                 color: Color.fromRGBO(236, 3, 68, 1)),
+//                             border: OutlineInputBorder(
+//                               borderSide: BorderSide(
+//                                 color: Color.fromRGBO(236, 3, 68, 1),
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     Padding(
+//                         padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+//                         child: Image.asset("assets/heart.png")),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//             Expanded(
+//               child: Padding(
+//                 padding: const EdgeInsets.fromLTRB(10, 20, 2, 5),
+//                 child: FutureBuilder<List<Pokemon>>(
+//                   future: pokemonLista,
+//                   builder: (context, snapshot) {
+//                     if (snapshot.connectionState == ConnectionState.waiting) {
+//                       // Enquanto o Future estiver esperando, exibir um indicador de carregamento
+//                       return const Center(
+//                           child:
+//                               CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+//                     } else if (snapshot.hasError) {
+//                       return Column(
+//                         children: [
+//                           const Center(
+//                             child: Text('Erro ao carregar pokemons'),
+//                           ),
+//                           Center(
+//                             child: TextButton(
+//                               onPressed: () async {
+//                                 //await pokemonLista;
+//                                 pokemonLista = PokedexController()
+//                                     .buscandoDadosDosPokemons(contador = 0);
+//                                 setState(() {});
+//                                 if (snapshot.connectionState ==
+//                                     ConnectionState.waiting) {
+//                                   const Center(
+//                                       child:
+//                                           CircularProgressIndicator()); // No centro para o usuario ter impressão de loading
+//                                 }
+//                               },
+//                               child: const Text(
+//                                 "Clique aqui para carregar dados novamente",
+//                                 style: TextStyle(
+//                                     fontSize: 20, fontWeight: FontWeight.bold),
+//                               ),
+//                             ),
+//                           )
+//                         ],
+//                       );
+//                     } else {
+//                       // Se os dados forem carregados com sucesso, construa o GridView
+//                       final pokemonLista =
+//                           snapshot.data ?? []; // Obtenha a lista de pokemons
+//                       return GridView.builder(
+//                         gridDelegate:
+//                             const SliverGridDelegateWithFixedCrossAxisCount(
+//                                 crossAxisCount: 3,
+//                                 childAspectRatio: 1.2,
+//                                 mainAxisSpacing: 1,
+//                                 crossAxisSpacing: 1),
+//                         itemCount: pokemonLista.length, // Usar o comprimento da lista de pokemons
+//                         itemBuilder: (context, index) {
+//                           final pokemon = pokemonLista[index];
+//                           return Padding(
+//                             padding: const EdgeInsets.all(4.0),
+//                             child: Card(
+//                               child: Column(
+//                                 mainAxisAlignment: MainAxisAlignment
+//                                     .center, // Centraliza na vertical
+//                                 children: [
+//                                   Row(
+//                                     mainAxisAlignment: MainAxisAlignment.end,
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.center,
+//                                     children: [
+//                                       Text(
+//                                         "#${pokemon.id}",
+//                                         textAlign: TextAlign.end,
+//                                         style: TextStyle(
+//                                             color: Color.fromRGBO(
+//                                                 pokemon.primeiroValorCor,
+//                                                 pokemon.segundoValorCor,
+//                                                 pokemon.terceiroValorCor,
+//                                                 pokemon.quartoValorCor)),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                   Padding(
+//                                     padding:
+//                                         const EdgeInsets.fromLTRB(0, 0, 0, 0),
+//                                     child: Image.network(
+//                                       width: 49,
+//                                       pokemon.imageUrl,
+//                                     ),
+//                                   ),
+//                                   Container(
+//                                     color: Color.fromRGBO(
+//                                         pokemon.primeiroValorCor,
+//                                         pokemon.segundoValorCor,
+//                                         pokemon.terceiroValorCor,
+//                                         pokemon.quartoValorCor),
+//                                     child: Row(
+//                                       mainAxisAlignment:
+//                                           MainAxisAlignment.center,
+//                                       children: [
+//                                         Text(
+//                                           pokemon.name,
+//                                           textAlign: TextAlign.end,
+//                                           style: const TextStyle(
+//                                               color: Colors
+//                                                   .white), // Define a cor do texto como branca
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+//                           );
+//                         },
+//                       );
+//                     }
+//                   },
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//         floatingActionButton: Column(
+//           mainAxisAlignment: MainAxisAlignment.end,
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Center(
+//                   child: FloatingActionButton(
+//                     onPressed: () {},
+//                     backgroundColor: Colors.transparent,
+//                     child: IconButton(
+//                       icon: const Icon(
+//                         Icons.arrow_downward_outlined,
+//                         color: Color.fromRGBO(236, 3, 68, 1),
+//                       ),
+//                       onPressed: () async {
+//                         await carregarMaisPokemons();
+//                         setState(() {});
+//                       },
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
